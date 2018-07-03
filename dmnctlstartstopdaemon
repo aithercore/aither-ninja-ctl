@@ -1,6 +1,5 @@
 #!/usr/bin/php
 <?php
-
 /*
     This file is part of Dash Ninja.
     https://github.com/elbereth/dashninja-ctl
@@ -19,20 +18,14 @@
     along with Dash Ninja.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-
-DEFINE('DMN_SCRIPT',true);
-
+DEFINE('DMN_SCRIPT', true);
 // Load configuration
 require_once('dmn.config.inc.php');
-
 // Load common functions
 require_once('dmn.functions.inc.php');
-
 // Load external libraries
-require_once('EasyDash-PHP/easydash.php');
+require_once('aither-easy-php/aitherp.php');
 require_once('DashConfig.class.php');
-
 // Load the script
 require_once('dmnctlstartstopdaemon.script.inc.php');
-
 ?>

@@ -36,8 +36,8 @@ DEFINE('DMN_PID_PREFIX','dmn');
 //  Regex for masternode usernames
 DEFINE('DMN_PID_REGEX',"/dmn(\d\d*)/");
 
-// Default path to dashd
-DEFINE('DMN_DASHD_DEFAULT','/usr/local/bin/dashd');
+// Default path to aitherd
+DEFINE('DMN_DASHD_DEFAULT','/usr/local/bin/aitherd');
 
 // How much to wait for start/stop before giving up (in seconds)
 DEFINE('DMN_STOPWAIT',10);
@@ -52,7 +52,7 @@ DEFINE('DMN_NRCOUNT_TEST',6);
 // Where to store the counter file
 DEFINE('DMN_NRCOUNTDIR','/tmp/');
 // Log NRs
-DEFINE('DMN_NRCOUNTLOG','/var/log/dmn/nrcount.log');
+DEFINE('DMN_NRCOUNTLOG','log/nrcount.log');
 
 // Parallel threads (for start-stop and RPC commands)
 DEFINE('DMN_THREADS_MAX',8);

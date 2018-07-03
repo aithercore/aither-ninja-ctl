@@ -1,5 +1,4 @@
 <?php
-
 /*
     This file is part of Dash Ninja.
     https://github.com/elbereth/dashninja-fe
@@ -18,15 +17,12 @@
     along with Dash Ninja.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-
-DEFINE('DMN_VERSION','0.1.1');
-
+DEFINE('DMN_VERSION', '0.1.1');
 function generate_masternodeactive($mysqli) {
 
-    xecho("Generating masternodes active:\n");
-    semaphore(DMN_DBGEN_SEMAPHORE);
-
-    $sql = <<<EOT
+	xecho("Generating masternodes active:\n");
+	semaphore(DMN_DBGEN_SEMAPHORE);
+	$sql = <<<EOT
 INSERT INTO cmd_info_masternode_active (MasternodeOutputHash, MasternodeOutputIndex, MasternodeTestNet, MasternodeProtocol, ActiveCount, InactiveCount, UnlistedCount, LastSeen)
     SELECT
         ciml.MasternodeOutputHash,
@@ -54,68 +50,55 @@ INSERT INTO cmd_info_masternode_active (MasternodeOutputHash, MasternodeOutputIn
         ciml.MasternodeOutputHash, ciml.MasternodeOutputIndex, ciml.MasternodeTestNet, cns.NodeProtocol
 ON DUPLICATE KEY UPDATE ActiveCount = VALUES(ActiveCount), InactiveCount = VALUES(InactiveCount), UnlistedCount = VALUES(UnlistedCount), LastSeen = current_timestamp() 	
 EOT;
-
-    if ($result = $mysqli->query($sql)) {
-        xecho("\e[42m\e[1;37m OK \e[0m ".$mysqli->affected_rows . "\n");
-        xecho("Retrieving current timestamp in table:\n");
-        $sql = "SELECT UNIX_TIMESTAMP(MAX(`LastSeen`)), UNIX_TIMESTAMP(current_timestamp()) FROM `cmd_info_masternode_active` WHERE 1";
-        if ($result = $mysqli->query($sql)) {
-            $row = $result->fetch_array(MYSQLI_NUM);
-            xecho("\e[42m\e[1;37m OK \e[0m ".$row[1]." -- ".$row[0]."\n");
-            if ($row[1]-$row[0]>300) {
-                xecho("\e[43m\e[1;31m WARNING \e[0m ".($row[1]-$row[0])." seconds old data in database, something is wrong !");
-            }
-            xecho("Purging old entries in database (older than 120 seconds from last insert/update):\n");
-            $sql = "DELETE FROM cmd_info_masternode_active WHERE LastSeen < FROM_UNIXTIME(".($row[0]-120).")";
-            if ($result = $mysqli->query($sql)) {
-                xecho("\e[42m\e[1;37m OK \e[0m ".$mysqli->affected_rows." ".$mysqli->info."\n");
-            }
-            else{
-                xecho("\e[41m\e[0;33m SQL ERROR \e[0m \e[1;33m".$mysqli->errno.": ".$mysqli->error."\n");
-            }
-        }
-        else{
-            xecho("\e[41m\e[0;33m SQL ERROR \e[0m \e[1;33m".$mysqli->errno.": ".$mysqli->error."\n");
-        }
-    }
-    else{
-        xecho("\e[41m\e[0;33m SQL ERROR \e[0m \e[1;33m".$mysqli->errno.": ".$mysqli->error."\n");
-    }
-
-    unlink(DMN_DBGEN_SEMAPHORE);
+	if ($result = $mysqli->query($sql)) {
+		xecho("\e[42m\e[1;37m OK \e[0m " . $mysqli->affected_rows . "\n");
+		xecho("Retrieving current timestamp in table:\n");
+		$sql = "SELECT UNIX_TIMESTAMP(MAX(`LastSeen`)), UNIX_TIMESTAMP(current_timestamp()) FROM `cmd_info_masternode_active` WHERE 1";
+		if ($result = $mysqli->query($sql)) {
+			$row = $result->fetch_array(MYSQLI_NUM);
+			xecho("\e[42m\e[1;37m OK \e[0m " . $row[1] . " -- " . $row[0] . "\n");
+			if ($row[1] - $row[0] > 300) {
+				xecho("\e[43m\e[1;31m WARNING \e[0m " . ($row[1] - $row[0]) . " seconds old data in database, something is wrong !");
+			}
+			xecho("Purging old entries in database (older than 120 seconds from last insert/update):\n");
+			$sql = "DELETE FROM cmd_info_masternode_active WHERE LastSeen < FROM_UNIXTIME(" . ($row[0] - 120) . ")";
+			if ($result = $mysqli->query($sql)) {
+				xecho("\e[42m\e[1;37m OK \e[0m " . $mysqli->affected_rows . " " . $mysqli->info . "\n");
+			} else {
+				xecho("\e[41m\e[0;33m SQL ERROR \e[0m \e[1;33m" . $mysqli->errno . ": " . $mysqli->error . "\n");
+			}
+		} else {
+			xecho("\e[41m\e[0;33m SQL ERROR \e[0m \e[1;33m" . $mysqli->errno . ": " . $mysqli->error . "\n");
+		}
+	} else {
+		xecho("\e[41m\e[0;33m SQL ERROR \e[0m \e[1;33m" . $mysqli->errno . ": " . $mysqli->error . "\n");
+	}
+	unlink(DMN_DBGEN_SEMAPHORE);
 }
 
-
-
-xecho("\033[1;31mDASH Ninja \033[0;31mControl \033[1;33mDatabase Generator \033[0;37mv\033[1;32m".DMN_VERSION."\n");
-
+xecho("\033[1;31mDASH Ninja \033[0;31mControl \033[1;33mDatabase Generator \033[0;37mv\033[1;32m" . DMN_VERSION . "\n");
 if ($argc != 2) {
-    xecho("Usage: ".$argv[0]." <command>\n");
-    xecho("Command can be: masternodeactive = Generate the masternode active table content\n");
-    die(10);
+	xecho("Usage: " . $argv[0] . " <command>\n");
+	xecho("Command can be: masternodeactive = Generate the masternode active table content\n");
+	die(10);
 }
-
 xecho("Connecting to MySQL...\n");
 $mysqli = new mysqli(DMNCTLMYSQLHOST, DMNCTLMYSQLUSER, DMNCTLMYSQLPASS, DMNCTLMYSQLDATABASE);
 if ($mysqli->connect_error) {
-    xecho("\033[41m\033[0;33m ERROR \033[0m \033[1;31m".$mysqli->connect_errno.' - '. $mysqli->connect_error."\n");
-    die;
+	xecho("\033[41m\033[0;33m ERROR \033[0m \033[1;31m" . $mysqli->connect_errno . ' - ' . $mysqli->connect_error . "\n");
+	die;
 }
-xecho("\e[42m\e[1;37m CONNECTED \e[0m ".$mysqli->host_info." (".$mysqli->server_version.")\n");
-
+xecho("\e[42m\e[1;37m CONNECTED \e[0m " . $mysqli->host_info . " (" . $mysqli->server_version . ")\n");
 if ($argv[1] == "masternodeactive") {
-    generate_masternodeactive($mysqli);
+	generate_masternodeactive($mysqli);
+} else {
+	xecho("Unknown command " . $argv[1] . "\n");
+	die(11);
 }
-else {
-    xecho("Unknown command ".$argv[1]."\n");
-    die(11);
-}
-
 xecho("Disconnecting MySQL...\n");
 if ($mysqli->close()) {
-    xecho("\e[42m\e[1;37m OK \e[0m\n");
-    die;
+	xecho("\e[42m\e[1;37m OK \e[0m\n");
+	die;
 }
-xecho("\033[41m\033[0;33m ERROR \033[0m \033[1;31m".$mysqli->errno.' - '. $mysqli->error."\n");
-
+xecho("\033[41m\033[0;33m ERROR \033[0m \033[1;31m" . $mysqli->errno . ' - ' . $mysqli->error . "\n");
 ?>

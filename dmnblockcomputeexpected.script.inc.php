@@ -1,5 +1,4 @@
 <?php
-
 /*
     This file is part of Dash Ninja.
     https://github.com/elbereth/dashninja-ctl
@@ -18,44 +17,35 @@
     along with Dash Ninja.  If not, see <http://www.gnu.org/licenses/>.
 
  */
-
 if (!defined('DMN_SCRIPT') || !defined('DMN_CONFIG') || (DMN_SCRIPT !== true) || (DMN_CONFIG !== true)) {
-  die('Not executable');
+	die('Not executable');
 }
-
-define('DMN_VERSION','1.0.0');
-
-xecho('dmnblockcomputeexpected v'.DMN_VERSION."\n");
-
+define('DMN_VERSION', '1.0.0');
+xecho('dmnblockcomputeexpected v' . DMN_VERSION . "\n");
 if (($argc < 3) || ($argc > 5)) {
-  xecho("Usage: dmnblockcomputeexpected testnet blockfrom [blockto]\n");
-  die(1);
+	xecho("Usage: dmnblockcomputeexpected testnet blockfrom [blockto]\n");
+	die(1);
 }
-
 $testnet = intval($argv[1]);
 if ($testnet < 0) {
-  $testnet = 0;
+	$testnet = 0;
 }
 if ($testnet > 1) {
-  $testnet = 1;
+	$testnet = 1;
 }
 $blockfrom = intval($argv[2]);
 if ($argc == 4) {
-  $blockto = intval($argv[3]);
+	$blockto = intval($argv[3]);
+} else {
+	$blockto = $blockfrom;
 }
-else {
-  $blockto = $blockfrom;
-}
-
-xecho("Computing expected for block $blockfrom to $blockto (".($blockto-$blockfrom+1)." blocks/testnet=$testnet):\n");
+xecho("Computing expected for block $blockfrom to $blockto (" . ($blockto - $blockfrom + 1) . " blocks/testnet=$testnet):\n");
 xecho("Connecting to MySQL...\n");
 $mysqli = new mysqli(DMNCTLMYSQLHOST, DMNCTLMYSQLUSER, DMNCTLMYSQLPASS, DMNCTLMYSQLDATABASE);
 if ($mysqli->connect_error) {
-  die('Connect Error (' . $mysqli->connect_errno . ') '
-            . $mysqli->connect_error);
+	die('Connect Error (' . $mysqli->connect_errno . ') ' . $mysqli->connect_error);
 }
-xecho("Connected: ".$mysqli->host_info." (".$mysqli->server_version.")\n");
-
+xecho("Connected: " . $mysqli->host_info . " (" . $mysqli->server_version . ")\n");
 $sql = <<<EOT
 DROP TABLE IF EXISTS _cibh_nodecount;
 CREATE TEMPORARY TABLE IF NOT EXISTS
@@ -99,40 +89,26 @@ CREATE TEMPORARY TABLE IF NOT EXISTS _cibh_maxnodecount ENGINE=MEMORY AS (
         );
 SELECT NC.BlockHeight BlockHeight, BlockMNPayee, BlockMNRatio FROM _cibh_maxnodecount MNC, _cibh_nodecount NC WHERE MNC.BlockHeight = NC.BlockHeight AND MNC.MaxCountNode = NC.CountNode;
 EOT;
-$sql = sprintf($sql,$blockfrom,$blockto,$testnet);
+$sql = sprintf($sql, $blockfrom, $blockto, $testnet);
 xecho("Executing query....\n");
 //echo $sql."\n";
 $blockhist = array();
-if ($mysqli->multi_query($sql) &&
-  $mysqli->more_results() && $mysqli->next_result() &&
-  $mysqli->more_results() && $mysqli->next_result() &&
-  $mysqli->more_results() && $mysqli->next_result() &&
-  $mysqli->more_results() && $mysqli->next_result() &&
-  ($result = $mysqli->store_result())) {
-  $update = array();
-  while($row = $result->fetch_assoc()){
-    $update[] = sprintf("(%d,%d,'%s',%.9f)",
-                                         $testnet,
-                                         intval($row['BlockHeight']),
-                                         $row['BlockMNPayee'],
-                                         floatval($row['BlockMNRatio']));
-  }
-  xecho("  Done (".count($update)." computed)\n");
-  $sql = "INSERT INTO cmd_info_blocks (BlockTestnet, BlockId, BlockMNPayeeExpected, BlockMNValueRatioExpected) VALUES ".implode(",",$update)
-        ." ON DUPLICATE KEY UPDATE BlockMNPayeeExpected = VALUES(BlockMNPayeeExpected), BlockMNValueRatioExpected = VALUES(BlockMNValueRatioExpected)";
-//  echo $sql."\n";
-  xecho("Updating expected values in block database:\n");
-  if ($result = $mysqli->query($sql)) {
-    xecho("  Done (".$mysqli->info.")\n");
-  }
-  else {
-    xecho("  Error (".$mysqli->errno.': '.$mysqli->error.")\n");
-  }
+if ($mysqli->multi_query($sql) && $mysqli->more_results() && $mysqli->next_result() && $mysqli->more_results() && $mysqli->next_result() && $mysqli->more_results() && $mysqli->next_result() && $mysqli->more_results() && $mysqli->next_result() && ($result = $mysqli->store_result())) {
+	$update = array();
+	while ($row = $result->fetch_assoc()) {
+		$update[] = sprintf("(%d,%d,'%s',%.9f)", $testnet, intval($row['BlockHeight']), $row['BlockMNPayee'], floatval($row['BlockMNRatio']));
+	}
+	xecho("  Done (" . count($update) . " computed)\n");
+	$sql = "INSERT INTO cmd_info_blocks (BlockTestnet, BlockId, BlockMNPayeeExpected, BlockMNValueRatioExpected) VALUES " . implode(",", $update) . " ON DUPLICATE KEY UPDATE BlockMNPayeeExpected = VALUES(BlockMNPayeeExpected), BlockMNValueRatioExpected = VALUES(BlockMNValueRatioExpected)";
+	//  echo $sql."\n";
+	xecho("Updating expected values in block database:\n");
+	if ($result = $mysqli->query($sql)) {
+		xecho("  Done (" . $mysqli->info . ")\n");
+	} else {
+		xecho("  Error (" . $mysqli->errno . ': ' . $mysqli->error . ")\n");
+	}
+} else {
+	xecho(" Failed (" . $mysqli->errno . ": " . $mysqli->error . ")\n");
+	die(2);
 }
-else {
-  xecho(" Failed (".$mysqli->errno.": ".$mysqli->error.")\n");
-  die(2);
-}
-
-
 ?>

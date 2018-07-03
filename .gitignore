@@ -1,5 +1,5 @@
 dmn.config.inc.php
-dashdupdate.php.lasthash
+aitherdupdate.php.lasthash
 .ssh
 .bash_history
 .bash_logout
@@ -8,3 +8,4 @@ dashdupdate.php.lasthash
 .profile
 .gitconfig
 dmnautoupdate.data.json
+.idea

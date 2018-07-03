@@ -8,7 +8,7 @@ It contains:
 * dash-node.php : is a php implementation of Dash protocol to retrieve subver during port checking
 * dashblocknotify : is the blocknotify script (for stats)
 * dashblockretrieve : is a script used to retrieve block information when blocknotify script did not work (for stats)
-* dashupdate : is an auto-update dashd script (uses git)
+* dashupdate : is an auto-update aitherd script (uses git)
 * dmnbalance : is the balance check script (for stats)
 * dmnblockcomputeexpected : is a script used to compute and store the expected fields in cmd_info_blocks table
 * dmnblockdegapper : is a script that detects if blocks are missing in cmd_info_blocks table and retrieve them if needed
@@ -50,7 +50,7 @@ git submodule update --init --recursive
 ```
 */1 * * * * /opt/dashninja-ctl/dmncron
 ```
-If you want to enable logging, you need to create the /var/log/dmn/ folder and give the user write access.
+If you want to enable logging, you need to create the log/ folder and give the user write access.
 Then add "log" as first argument when calling dmncron:
 ```
 */1 * * * * /opt/dashninja-ctl/dmncron log

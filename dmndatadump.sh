@@ -29,22 +29,22 @@ autoupdatelog=/dev/null
 # If parameter 1 is log then enable logging
 if [[ "$1" == "log" ]]; then
   rundate=$(date +%Y%m%d%H%M%S)
-  updatelog=/var/log/dmn/update.$rundate.log
-  statuslog=/var/log/dmn/status.$rundate.log
-  votesrrdlog=/var/log/dmn/votesrrd.$rundate.log
-  balancelog=/var/log/dmn/balance.$rundate.log
-  portchecklog=/var/log/dmn/portcheck.$rundate.log
-  blockparserlog=/var/log/dmn/blockparser.$rundate.log
-  autoupdatelog=/var/log/dmn/autoupdate.$rundate.log
+  updatelog=log/update.$rundate.log
+  statuslog=log/status.$rundate.log
+  votesrrdlog=log/votesrrd.$rundate.log
+  balancelog=log/balance.$rundate.log
+  portchecklog=log/portcheck.$rundate.log
+  blockparserlog=log/blockparser.$rundate.log
+  autoupdatelog=log/autoupdate.$rundate.log
 fi
 
 # Sequentially run scripts
-#/opt/dmnctl/dashdupdate >> $updatelog
-/opt/dmnctl/dmnctl status >> $statuslog
-#/opt/dmnctl/dmnvotesrrd >> $votesrrdlog
-/opt/dmnctl/dmnblockparser >> $blockparserlog
+#/mnt/d/Nginx/www/aither-ninja-ctl/aitherdupdate >> $updatelog
+/mnt/d/Nginx/www/aither-ninja-ctl/dmnctl status >> $statuslog
+#/mnt/d/Nginx/www/aither-ninja-ctl/dmnvotesrrd >> $votesrrdlog
+/mnt/d/Nginx/www/aither-ninja-ctl/dmnblockparser >> $blockparserlog
 
 # Concurrently run scripts
-/opt/dmnctl/dmnbalance >> $balancelog &
-/opt/dmnctl/dmnportcheck db >> $portchecklog &
-/opt/dmnctl/dmnautoupdate >> $autoupdatelog &
+/mnt/d/Nginx/www/aither-ninja-ctl/dmnbalance >> $balancelog &
+/mnt/d/Nginx/www/aither-ninja-ctl/dmnportcheck db >> $portchecklog &
+/mnt/d/Nginx/www/aither-ninja-ctl/dmnautoupdate >> $autoupdatelog &

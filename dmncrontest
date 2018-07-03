@@ -23,8 +23,8 @@ statuslog=/dev/null
 # If parameter 1 is log then enable logging
 if [[ "$1" == "log" ]]; then
   rundate=$(date +%Y%m%d%H%M%S)
-  statuslog=/var/log/dmn/status.$rundate.log
+  statuslog=log/status.$rundate.log
 fi
 
 # Sequentially run scripts
-/opt/dmnctl/dmnctl status testnet >> $statuslog
+/mnt/d/Nginx/www/aither-ninja-ctl/dmnctl status testnet >> $statuslog
